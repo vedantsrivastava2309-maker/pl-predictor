@@ -2,12 +2,13 @@
 main.py - the backend. Loads the saved models and answers prediction requests.
 
 Start it with:   python -m uvicorn main:app --reload
-Then open:       http://127.0.0.1:8000/docs
+Then open:       http://127.0.0.1:8000
 """
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from train import FEATURES, GOAL_FEATURES, poisson_probs
 
@@ -25,6 +26,12 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 def as_dict(p):
     """Probabilities arrive in the order A, D, H."""
     return {"home": round(float(p[2]), 3), "draw": round(float(p[1]), 3), "away": round(float(p[0]), 3)}
+
+
+@app.get("/")
+def home_page():
+    """The website itself."""
+    return FileResponse("index.html")
 
 
 @app.get("/teams")
